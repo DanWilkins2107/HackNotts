@@ -21,8 +21,6 @@ function addBlockToArray() {
 
 let newBlock = setInterval(createBlock, 1000)
 
-let gameEnded = false;
-
 function startGame() {
   ctx = gameCanvas.start();
   player = new createPlayer(30, 30, 10, 120);
