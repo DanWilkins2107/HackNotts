@@ -16,6 +16,9 @@ let activeBlocks = [];
 let activePowerups = [];
 let gameLoop;
 let newBlock;
+let newPowerup;
+let score;
+let powerups;
 
 function addBlockToArray() {
   let block = new createBlock(30, 30);
@@ -36,7 +39,10 @@ function startGame() {
 }
 
 function startGameLoop() {
-  gameLoop = setInterval(updateCanvas, 20);
+  clearInterval(gameLoop);
+  clearInterval(newBlock);
+  clearInterval(newPowerup);
+  gameLoop = setInterval(updateCanvas, 10);
   newBlock = setInterval(addBlockToArray, 1000);
   newPowerup = setInterval(addPowerupToArray, 3000);
 }
@@ -45,7 +51,6 @@ function updateCanvas() {
   if (!detectCollision()) {
     ctx = gameCanvas.context;
     ctx.clearRect(0, 0, canvasWidth, canvasHeight);
-    score.draw();
     player.draw();
     for (let block of activeBlocks) {
       block.move();
@@ -90,7 +95,8 @@ function gameEndScreen(highScore) {
   ctx.fillText(`Press Enter to Play Again`, x, y + 50);
   document.addEventListener("keydown", (event) => {
     if (event.key === "Enter") {
-      blocks = [];
+      activeBlocks = [];
+      activePowerups = [];
       startGame();
     }
   });
@@ -198,7 +204,6 @@ function createPowerup(width, height) {
         powerups.powerups.bomb += 1;
       }
       let index = activePowerups.indexOf(this);
-      // Only take out the one powerup
       activePowerups.splice(index, 1);
     }
   };
@@ -219,7 +224,6 @@ function createTimeLabel() {
       this.y
     );
   };
-
   this.saveScore = function () {
     return (score = Math.floor((Date.now() - startTime) / 500));
   };
