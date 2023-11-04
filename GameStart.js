@@ -14,3 +14,23 @@ let gameCanvas = {
     document.body.insertBefore(this.canvas, document.body.childNodes[0]);
   },
 };
+
+let player;
+
+function startGame() {
+    gameCanvas.start();
+    player = new createPlayer(30, 30, 10, 120);
+}
+
+function createPlayer(width, height, x, y) {
+    this.width = width;
+    this.height = height;
+    this.x = x;
+    this.y = y; 
+    
+    ctx = gameCanvas.context;
+    ctx.fillStyel = "green";
+    ctx.fillRect(this.x, this.y, this.width, this.height);
+}
+
+
