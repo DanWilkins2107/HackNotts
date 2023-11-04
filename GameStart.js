@@ -12,13 +12,19 @@ let gameCanvas = {
 };
 
 let player;
-let blocks = [];
+let activeBlocks = [];
+let activePowerups = [];
 let gameLoop;
 let newBlock;
 
 function addBlockToArray() {
   let block = new createBlock(30, 30);
-  blocks.push(block);
+  activeBlocks.push(block);
+}
+
+function addPowerupToArray() {
+  let powerup = new createPowerup(30, 30);
+  activePowerups.push(powerup);
 }
 
 function startGame() {
@@ -32,6 +38,7 @@ function startGame() {
 function startGameLoop() {
   gameLoop = setInterval(updateCanvas, 20);
   newBlock = setInterval(addBlockToArray, 1000);
+  newPowerup = setInterval(addPowerupToArray, 3000);
 }
 
 function updateCanvas() {
@@ -39,10 +46,16 @@ function updateCanvas() {
     ctx = gameCanvas.context;
     ctx.clearRect(0, 0, canvasWidth, canvasHeight);
     player.draw();
-    for (let block of blocks) {
+    for (let block of activeBlocks) {
       block.move();
       block.delete();
       block.draw();
+    }
+    for (let powerup of activePowerups) {
+      powerup.move();
+      powerup.delete();
+      powerup.contact();
+      powerup.draw();
     }
     score.draw();
     powerups.draw();
@@ -54,7 +67,7 @@ function updateCanvas() {
 function stopGame() {
   clearInterval(gameLoop);
   clearInterval(newBlock);
-  blocks = [];
+  activeBlocks = [];
   let highScore = score.saveScore();
   console.log(highScore);
   gameEndScreen(highScore);
@@ -71,7 +84,7 @@ function gameEndScreen(highScore) {
   ctx.font = "50px Arial";
   ctx.fillText(`Score: ${highScore}`, 200, 200);
   ctx.font = "30px Arial";
-  ctx.fillText(`Press Enter to Play Again`,100, 235);
+  ctx.fillText(`Press Enter to Play Again`, 100, 235);
   document.addEventListener("keydown", (event) => {
     if (event.key === "Enter") {
       startGame();
@@ -82,7 +95,7 @@ function gameEndScreen(highScore) {
 function detectCollision() {
   collisionDetected = false;
 
-  for (let block of blocks) {
+  for (let block of activeBlocks) {
     if (
       player.x < block.x + block.width &&
       player.x + player.width > block.x &&
@@ -118,7 +131,7 @@ function createBlock(width, height) {
 
   this.delete = function () {
     if (this.x < -100) {
-      blocks.shift();
+      activeBlocks.shift();
     }
   };
 
@@ -133,6 +146,60 @@ function createBlock(width, height) {
   };
 }
 
+function createPowerup(width, height) {
+  this.width = width;
+  this.height = height;
+  this.x = canvasWidth + 100;
+  this.y = Math.floor(Math.random() * canvasHeight - 20) + 10;
+  powerupTypes = ["turbo", "slowMo", "shield", "bomb"];
+  this.powerupType = powerupTypes[Math.floor(Math.random() * 4)];
+
+  this.delete = function () {
+    if (this.x < -100) {
+      activePowerups.shift();
+    }
+  };
+
+  this.move = function () {
+    this.x -= 1;
+  };
+
+  this.draw = function () {
+    ctx = gameCanvas.context;
+    if (this.powerupType === "turbo") {
+      ctx.fillStyle = "blue";
+    } else if (this.powerupType === "slowMo") {
+      ctx.fillStyle = "yellow";
+    } else if (this.powerupType === "shield") {
+      ctx.fillStyle = "purple";
+    } else if (this.powerupType === "bomb") {
+      ctx.fillStyle = "orange";
+    }
+    ctx.fillRect(this.x, this.y, this.width, this.height);
+  };
+  this.contact = function () {
+    if (
+      player.x < this.x + this.width &&
+      player.x + player.width > this.x &&
+      player.y < this.y + this.height &&
+      player.y + player.height > this.y
+    ) {
+      if (this.powerupType === "turbo") {
+        powerups.powerups.turbo += 1;
+      } else if (this.powerupType === "slowMo") {
+        powerups.powerups.slowMo += 1;
+      } else if (this.powerupType === "shield") {
+        powerups.powerups.shield += 1;
+      } else if (this.powerupType === "bomb") {
+        powerups.powerups.bomb += 1;
+      }
+      let index = activePowerups.indexOf(this);
+      // Only take out the one powerup
+      activePowerups.splice(index, 1);
+    }
+  };
+}
+
 function createTimeLabel() {
   const startTime = Date.now();
   this.x = 20;
@@ -142,12 +209,16 @@ function createTimeLabel() {
     ctx = gameCanvas.context;
     ctx.font = "20px Arial";
     ctx.fillStyle = "black";
-    ctx.fillText(`Score: ${Math.floor((Date.now() - startTime) / 500)}`, this.x, this.y);
+    ctx.fillText(
+      `Score: ${Math.floor((Date.now() - startTime) / 500)}`,
+      this.x,
+      this.y
+    );
   };
 
   this.saveScore = function () {
-    return score = Math.floor((Date.now() - startTime) / 500);
-  }
+    return (score = Math.floor((Date.now() - startTime) / 500));
+  };
 }
 
 function createPowerupBoard() {
@@ -159,8 +230,7 @@ function createPowerupBoard() {
     slowMo: 0,
     shield: 0,
     bomb: 0,
-  }
-
+  };
   this.draw = function () {
     ctx = gameCanvas.context;
     ctx.font = "20px Arial";
