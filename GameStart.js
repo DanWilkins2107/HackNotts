@@ -8,7 +8,6 @@ let gameCanvas = {
     this.canvas.height = canvasHeight;
     this.context = this.canvas.getContext("2d");
     document.body.insertBefore(this.canvas, document.body.childNodes[0]);
-    return this.context;
   },
 };
 
@@ -18,7 +17,6 @@ let blocks = [];
 function addBlockToArray() {
     let block = new createBlock(30, 30);
     blocks.push(block);
-    console.log(blocks.length);
 }
 
 let newBlock = setInterval(createBlock, 1000)
@@ -32,13 +30,12 @@ function startGame() {
 }
 
 function startGameLoop() {
-    console.log("game loop started");
     let gameLoop = setInterval(updateCanvas, 20);
     let newBlock = setInterval(addBlockToArray, 1000)
 }
 
 function updateCanvas() {
-  ctx = gameCanvas.context;
+  gameCanvas.context;
   ctx.clearRect(0, 0, canvasWidth, canvasHeight);
   player.draw();
   for (let block of blocks) {
@@ -68,7 +65,7 @@ function createPlayer(width, height, x, y) {
 function createBlock(width, height) {
   this.width = width;
   this.height = height;
-  this.x = canvasWidth - 100;
+  this.x = canvasWidth + 100;
   this.y = Math.floor(Math.random() * canvasHeight - 20) + 10;
 
   this.draw = function () {
