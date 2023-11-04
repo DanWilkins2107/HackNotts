@@ -21,8 +21,6 @@ function addBlockToArray() {
 
 let newBlock = setInterval(createBlock, 1000)
 
-let gameEnded = false;
-
 function startGame() {
   ctx = gameCanvas.start();
   player = new createPlayer(30, 30, 10, 120);
@@ -35,7 +33,7 @@ function startGameLoop() {
 }
 
 function updateCanvas() {
-  gameCanvas.context;
+  ctx = gameCanvas.context;
   ctx.clearRect(0, 0, canvasWidth, canvasHeight);
   player.draw();
   for (let block of blocks) {
@@ -56,10 +54,6 @@ function createPlayer(width, height, x, y) {
     ctx.fillStyle = "green";
     ctx.fillRect(this.x, this.y, this.width, this.height);
   };
-
-  ctx = gameCanvas.context;
-  ctx.fillStyle = "green";
-  ctx.fillRect(this.x, this.y, this.width, this.height);
 }
 
 function createBlock(width, height) {
@@ -67,24 +61,50 @@ function createBlock(width, height) {
   this.height = height;
   this.x = canvasWidth + 100;
   this.y = Math.floor(Math.random() * canvasHeight - 20) + 10;
+  
+  this.delete = function () {
+    if (this.x < -100) {
+      blocks.shift();
+    }
+  }
+  
+  this.move = function () {
+    this.x -= 1;
+  };
 
   this.draw = function () {
     ctx = gameCanvas.context;
     ctx.fillStyle = "red";
     ctx.fillRect(this.x, this.y, this.width, this.height);
   };
-
-  this.delete = function () {
-    if (this.x < -100) {
-        blocks.shift();
-    }
-  }
-
-  ctx = gameCanvas.context;
-  ctx.fillStyle = "red";
-  ctx.fillRect(this.x, this.y, this.width, this.height);
-
-  this.move = function () {
-    this.x -= 1;
-  };
 }
+
+let keyMap = {
+  left: ["a", "ArrowLeft"],
+  right: ["d", "ArrowRight"],
+  up: ["w", "ArrowUp"],
+  down: ["s", "ArrowDown"],
+};
+
+let keysPressed = {};
+
+document.addEventListener("keydown", (event) => {
+  keysPressed[event.key] = true;
+
+  if ((keyMap.left.includes(event.key) || keysPressed[keyMap.left[0]] || keysPressed[keyMap.left[1]]) && player.x > 0) {
+    player.x -= 10;
+  }
+  if ((keyMap.right.includes(event.key) || keysPressed[keyMap.right[0]] || keysPressed[keyMap.right[1]]) && player.x < canvasWidth - player.width) {
+    player.x += 10;
+  }
+  if ((keyMap.up.includes(event.key) || keysPressed[keyMap.up[0]] || keysPressed[keyMap.up[1]]) && player.y > 0) {
+    player.y -= 10;
+  }
+  if ((keyMap.down.includes(event.key) || keysPressed[keyMap.down[0]] || keysPressed[keyMap.down[1]]) && player.y < canvasHeight - player.height) {
+    player.y += 10;
+  }
+});
+
+document.addEventListener("keyup", (event) => {
+  delete keysPressed[event.key];
+});
