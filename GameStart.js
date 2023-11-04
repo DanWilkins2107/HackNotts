@@ -12,13 +12,17 @@ let gameCanvas = {
 };
 
 let player;
+let powerups;
+let score;
 let activeBlocks = [];
 let activePowerups = [];
+let shielded = false;
 let gameLoop;
 let newBlock;
 let newPowerup;
 let score;
 let powerups;
+let highScore;
 
 function addBlockToArray() {
   let block = new createBlock(30, 30);
@@ -61,11 +65,6 @@ function drawCanvas() {
   ctx = gameCanvas.context;
     ctx.clearRect(0, 0, canvasWidth, canvasHeight);
     player.draw();
-    for (let block of activeBlocks) {
-      block.move();
-      block.delete();
-      block.draw();
-    }
     for (let powerup of activePowerups) {
       powerup.move();
       powerup.delete();
@@ -76,8 +75,9 @@ function drawCanvas() {
 
 function stopGame() {
   clearInterval(gameLoop);
-  clearInterval(newBlock);  
-  let highScore = score.saveScore();
+  clearInterval(newBlock);
+  clearInterval(newPowerup);
+  highScore = score.saveScore();
   console.log(highScore);
   gameEndScreen(highScore);
 }
@@ -117,6 +117,14 @@ function detectCollision() {
       player.y < block.y + block.height &&
       player.y + player.height > block.y
     ) {
+      if (shielded === true) {
+        shielded = false;
+        player.colour = "green";
+        let index = activeBlocks.indexOf(block);
+        // Only take out the one block
+        activeBlocks.splice(index, 1);
+        break;
+      }
       collisionDetected = true;
       break;
     }
@@ -125,15 +133,37 @@ function detectCollision() {
   return collisionDetected;
 }
 
+function handleTurbo() {
+  //pass
+};
+
+function handleSlowMo() {
+  //pass
+};
+
+function handleShield() {
+  shielded = true;
+  //player.colour = "#aaff00";
+};
+
+function handleBomb() {
+  activeBlocks = [];
+};
+
 function createPlayer(width, height, x, y) {
   this.width = width;
   this.height = height;
   this.x = x;
   this.y = y;
+  this.colour = "#008000"
 
   this.draw = function () {
     ctx = gameCanvas.context;
-    ctx.fillStyle = "green";
+    if (shielded === true) {
+      ctx.fillStyle = "white";
+      ctx.fillRect(this.x - 2, this.y - 2, this.width + 4, this.height + 4);
+    }
+    ctx.fillStyle = this.colour;
     ctx.fillRect(this.x, this.y, this.width, this.height);
   };
 }
@@ -166,7 +196,7 @@ function createPowerup(width, height) {
   this.height = height;
   this.x = canvasWidth + 100;
   this.y = Math.floor(Math.random() * canvasHeight - 20) + 10;
-  powerupTypes = ["turbo", "slowMo", "shield", "bomb"];
+  const powerupTypes = ["turbo", "slowMo", "shield", "bomb"];
   this.powerupType = powerupTypes[Math.floor(Math.random() * 4)];
 
   this.delete = function () {
@@ -200,13 +230,13 @@ function createPowerup(width, height) {
       player.y + player.height > this.y
     ) {
       if (this.powerupType === "turbo") {
-        powerups.powerups.turbo += 1;
+        powerups.powerupsCount.turbo += 1;
       } else if (this.powerupType === "slowMo") {
-        powerups.powerups.slowMo += 1;
+        powerups.powerupsCount.slowMo += 1;
       } else if (this.powerupType === "shield") {
-        powerups.powerups.shield += 1;
+        powerups.powerupsCount.shield += 1;
       } else if (this.powerupType === "bomb") {
-        powerups.powerups.bomb += 1;
+        powerups.powerupsCount.bomb += 1;
       }
       let index = activePowerups.indexOf(this);
       activePowerups.splice(index, 1);
@@ -216,17 +246,15 @@ function createPowerup(width, height) {
 
 function createTimeLabel() {
   const startTime = Date.now();
-  this.x = 20;
-  this.y = 30;
 
   this.draw = function () {
     ctx = gameCanvas.context;
     ctx.font = "20px Arial";
-    ctx.fillStyle = "black";
+    ctx.fillStyle = "white";
     ctx.fillText(
       `Score: ${Math.floor((Date.now() - startTime) / 500)}`,
-      this.x,
-      this.y
+      20,
+      30
     );
   };
   this.saveScore = function () {
@@ -238,7 +266,7 @@ function createPowerupBoard() {
   this.x = 300;
   this.y = 0;
 
-  this.powerups = {
+  this.powerupsCount = {
     turbo: 0,
     slowMo: 0,
     shield: 0,
@@ -249,7 +277,7 @@ function createPowerupBoard() {
     ctx.font = "20px Arial";
     ctx.fillStyle = "#FFFFFF80";
     ctx.fillRect(this.x, this.y, 300, 75);
-    ctx.fillStyle = "black";
+    ctx.fillStyle = "white";
     ctx.fillText("Powerups", this.x + 120, this.y + 20);
     ctx.font = "15px Arial";
     ctx.fillText("Turbo", this.x + 10, this.y + 40);
@@ -257,10 +285,10 @@ function createPowerupBoard() {
     ctx.fillText("Shield", this.x + 170, this.y + 40);
     ctx.fillText("Bomb ", this.x + 250, this.y + 40);
     ctx.font = "20px Arial";
-    ctx.fillText(this.powerups.turbo, this.x + 24, this.y + 65);
-    ctx.fillText(this.powerups.slowMo, this.x + 105, this.y + 65);
-    ctx.fillText(this.powerups.shield, this.x + 185, this.y + 65);
-    ctx.fillText(this.powerups.bomb, this.x + 265, this.y + 65);
+    ctx.fillText(this.powerupsCount.turbo, this.x + 24, this.y + 65);
+    ctx.fillText(this.powerupsCount.slowMo, this.x + 105, this.y + 65);
+    ctx.fillText(this.powerupsCount.shield, this.x + 185, this.y + 65);
+    ctx.fillText(this.powerupsCount.bomb, this.x + 265, this.y + 65);
   };
 }
 
@@ -276,6 +304,7 @@ let keysPressed = {};
 document.addEventListener("keydown", (event) => {
   keysPressed[event.key] = true;
 
+  //  Direction handling
   if (
     (keyMap.left.includes(event.key) ||
       keysPressed[keyMap.left[0]] ||
@@ -307,6 +336,32 @@ document.addEventListener("keydown", (event) => {
     player.y < canvasHeight - player.height
   ) {
     player.y += 10;
+  }
+
+  //  Powerup handling
+  if (event.key === "t") {
+    if (powerups.powerupsCount.turbo > 0) {
+      powerups.powerupsCount.turbo -= 1;
+      handleTurbo();
+    }
+  }
+  if (event.key === "y") {
+    if (powerups.powerupsCount.slowMo > 0) {
+      powerups.powerupsCount.slowMo -= 1;
+      handleSlowMo();
+    }
+  }
+  if (event.key === "g") {
+    if (powerups.powerupsCount.shield > 0 && shielded === false) {
+      powerups.powerupsCount.shield -= 1;
+      handleShield();
+    }
+  }
+  if (event.key === "h") {
+    if (powerups.powerupsCount.bomb > 0) {
+      powerups.powerupsCount.bomb -= 1;
+      handleBomb();
+    }
   }
 });
 
