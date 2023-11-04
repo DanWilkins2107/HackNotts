@@ -7,7 +7,7 @@ let gameCanvas = {
     this.canvas.width = canvasWidth;
     this.canvas.height = canvasHeight;
     this.context = this.canvas.getContext("2d");
-    document.body.insertBefore(this.canvas, document.body.childNodes[0]);
+    document.body.appendChild(this.canvas);
   },
 };
 
@@ -45,6 +45,7 @@ function updateCanvas() {
   if (!detectCollision()) {
     ctx = gameCanvas.context;
     ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+    score.draw();
     player.draw();
     for (let block of activeBlocks) {
       block.move();
@@ -66,8 +67,7 @@ function updateCanvas() {
 
 function stopGame() {
   clearInterval(gameLoop);
-  clearInterval(newBlock);
-  activeBlocks = [];
+  clearInterval(newBlock);  
   let highScore = score.saveScore();
   console.log(highScore);
   gameEndScreen(highScore);
@@ -75,18 +75,22 @@ function stopGame() {
 
 function gameEndScreen(highScore) {
   ctx = gameCanvas.context;
-  ctx.clearRect(0, 0, canvasWidth, canvasHeight);
-  ctx.fillStyle = "green";
-  ctx.fillRect(30, 20, canvasWidth - 90, canvasHeight - 60);
-  ctx.font = "80px Arial";
+  //ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+  ctx.fillStyle = "#505d6b85";
+  ctx.fillRect(30, 20, canvasWidth - 60, canvasHeight - 40);
+  ctx.font = "75px Arial";
   ctx.fillStyle = "white";
-  ctx.fillText(`Game Over!`, 80, 150);
-  ctx.font = "50px Arial";
-  ctx.fillText(`Score: ${highScore}`, 200, 200);
+  ctx.textAlign = "center";
+  const x = canvasWidth / 2;
+  const y = canvasHeight / 2;
+  ctx.fillText(`Game Over!`, x, y - 50);
+  ctx.font = "60px Arial";
+  ctx.fillText(`Score: ${highScore}`, x, y + 10);
   ctx.font = "30px Arial";
-  ctx.fillText(`Press Enter to Play Again`, 100, 235);
+  ctx.fillText(`Press Enter to Play Again`, x, y + 50);
   document.addEventListener("keydown", (event) => {
     if (event.key === "Enter") {
+      blocks = [];
       startGame();
     }
   });

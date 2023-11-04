@@ -1,0 +1,17 @@
+body {
+	background-color: #b2d8d8;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+}
+
+h1 {
+	font-family: 'Roboto', sans-serif;
+	font-size: 3em;
+}
+
+canvas {
+	border: 3px solid black;
+	background-color: #fff;
+}
