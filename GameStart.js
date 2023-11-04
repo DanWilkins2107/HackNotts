@@ -24,7 +24,8 @@ function addBlockToArray() {
 function startGame() {
   gameCanvas.start();
   player = new createPlayer(30, 30, 10, 120);
-  score = new createTimeLabel(20, 30);
+  score = new createTimeLabel();
+  powerups = new createPowerupBoard();
   startGameLoop();
 }
 
@@ -38,12 +39,13 @@ function updateCanvas() {
     ctx = gameCanvas.context;
     ctx.clearRect(0, 0, canvasWidth, canvasHeight);
     player.draw();
-    score.draw();
     for (let block of blocks) {
       block.move();
       block.delete();
       block.draw();
     }
+    score.draw();
+    powerups.draw();
   } else {
     stopGame();
   }
@@ -131,12 +133,10 @@ function createBlock(width, height) {
   };
 }
 
-function createTimeLabel(x, y) {
+function createTimeLabel() {
   const startTime = Date.now();
-  this.x = x;
-  this.y = y;
-
-  //this.stop = function () {};
+  this.x = 20;
+  this.y = 30;
 
   this.draw = function () {
     ctx = gameCanvas.context;
@@ -148,6 +148,37 @@ function createTimeLabel(x, y) {
   this.saveScore = function () {
     return score = Math.floor((Date.now() - startTime) / 500);
   }
+}
+
+function createPowerupBoard() {
+  this.x = 300;
+  this.y = 0;
+
+  this.powerups = {
+    turbo: 0,
+    slowMo: 0,
+    shield: 0,
+    bomb: 0,
+  }
+
+  this.draw = function () {
+    ctx = gameCanvas.context;
+    ctx.font = "20px Arial";
+    ctx.fillStyle = "#FFFFFF80";
+    ctx.fillRect(this.x, this.y, 300, 75);
+    ctx.fillStyle = "black";
+    ctx.fillText("Powerups", this.x + 120, this.y + 20);
+    ctx.font = "15px Arial";
+    ctx.fillText("Turbo", this.x + 10, this.y + 40);
+    ctx.fillText("Slow Mo", this.x + 80, this.y + 40);
+    ctx.fillText("Shield", this.x + 170, this.y + 40);
+    ctx.fillText("Bomb ", this.x + 250, this.y + 40);
+    ctx.font = "20px Arial";
+    ctx.fillText(this.powerups.turbo, this.x + 24, this.y + 65);
+    ctx.fillText(this.powerups.slowMo, this.x + 105, this.y + 65);
+    ctx.fillText(this.powerups.shield, this.x + 185, this.y + 65);
+    ctx.fillText(this.powerups.bomb, this.x + 265, this.y + 65);
+  };
 }
 
 let keyMap = {
