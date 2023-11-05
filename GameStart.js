@@ -368,25 +368,25 @@ document.addEventListener("keydown", (event) => {
   }
 
   //  Powerup handling
-  if (event.key === "t") {
+  if (event.key === "1") {
     if (powerups.powerupsCount.turbo > 0) {
       powerups.powerupsCount.turbo -= 1;
       handleTurbo();
     }
   }
-  if (event.key === "y") {
+  if (event.key === "2") {
     if (powerups.powerupsCount.slowMo > 0) {
       powerups.powerupsCount.slowMo -= 1;
       handleSlowMo();
     }
   }
-  if (event.key === "g") {
+  if (event.key === "3") {
     if (powerups.powerupsCount.shield > 0 && shielded === false) {
       powerups.powerupsCount.shield -= 1;
       handleShield();
     }
   }
-  if (event.key === "h") {
+  if (event.key === "4") {
     if (powerups.powerupsCount.bomb > 0) {
       powerups.powerupsCount.bomb -= 1;
       handleBomb();
