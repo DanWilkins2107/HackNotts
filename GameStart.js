@@ -18,18 +18,34 @@ let activeBlocks = [];
 let activePowerups = [];
 let shielded = false;
 let gameLoop;
-let newBlock;
-let newPowerup;
+let blockIncreaseSpeed;
 let highScore;
+let playerSpeedMultiplier;
+let blockSpeedMultiplier;
+let gameRun = 0;
 
-function addBlockToArray() {
+function addBlockToArray(assignedGame) {
   let block = new createBlock(30, 30);
   activeBlocks.push(block);
+  setTimeout(() => {checkBlockToArrayGameEnd(assignedGame)}, 1000/blockSpeedMultiplier ** 4);
 }
 
-function addPowerupToArray() {
+function addPowerupToArray(assignedGame) {
   let powerup = new createPowerup(30, 30);
   activePowerups.push(powerup);
+  setTimeout(() => {checkPowerupToArrayGameEnd(assignedGame)}, 3000/blockSpeedMultiplier ** 4);
+}
+
+function checkBlockToArrayGameEnd(assignedGame) {
+  if (gameRun === assignedGame) {
+    addBlockToArray(assignedGame);
+  }
+}
+
+function checkPowerupToArrayGameEnd(assignedGame) {
+  if (gameRun === assignedGame) {
+    addPowerupToArray(assignedGame);
+  }
 }
 
 function startGame() {
@@ -41,12 +57,22 @@ function startGame() {
 }
 
 function startGameLoop() {
+  clearInterval(blockIncreaseSpeed);
   clearInterval(gameLoop);
-  clearInterval(newBlock);
-  clearInterval(newPowerup);
+  blockSpeedMultiplier = 1;
+  gameRun += 1;
+  blockIncreaseSpeed = setInterval(blockSpeedUp, 10000);
   gameLoop = setInterval(updateCanvas, 10);
-  newBlock = setInterval(addBlockToArray, 1000);
-  newPowerup = setInterval(addPowerupToArray, 3000);
+  addBlockToArray(gameRun);
+  addPowerupToArray(gameRun);
+}
+
+function blockSpeedUp() {
+  if (blockSpeedMultiplier < 2) {
+    blockSpeedMultiplier *= 1.1;
+  } else {
+    blockSpeedMultiplier *= 1.05;
+  }
 }
 
 function updateCanvas() {
@@ -54,6 +80,7 @@ function updateCanvas() {
     drawCanvas();
     score.draw();
     powerups.draw();
+    console.log(activeBlocks.length)
   } else {
     stopGame();
   }
@@ -78,14 +105,13 @@ function drawCanvas() {
 
 function stopGame() {
   clearInterval(gameLoop);
-  clearInterval(newBlock);
-  clearInterval(newPowerup);
   highScore = score.saveScore();
   console.log(highScore);
   gameEndScreen(highScore);
 }
 
 function gameEndScreen(highScore) {
+  let gameEnded = true;
   ctx = gameCanvas.context;
   ctx.clearRect(0, 0, canvasWidth, canvasHeight);
   drawCanvas();
@@ -102,7 +128,8 @@ function gameEndScreen(highScore) {
   ctx.font = "30px Arial";
   ctx.fillText(`Press Enter to Play Again`, x, y + 50);
   document.addEventListener("keydown", (event) => {
-    if (event.key === "Enter") {
+    if (event.key === "Enter" && gameEnded === true) {
+      gameEnded = false;
       activeBlocks = [];
       activePowerups = [];
       startGame();
@@ -184,7 +211,7 @@ function createBlock(width, height) {
   };
 
   this.move = function () {
-    this.x -= 1;
+    this.x -= 1*blockSpeedMultiplier;
   };
 
   this.draw = function () {
@@ -209,7 +236,7 @@ function createPowerup(width, height) {
   };
 
   this.move = function () {
-    this.x -= 1;
+    this.x -= 1.25*blockSpeedMultiplier;
   };
 
   this.draw = function () {
