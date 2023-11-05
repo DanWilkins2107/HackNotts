@@ -273,9 +273,7 @@ document.addEventListener("keydown", (event) => {
     }
   }
   if (event.key === "2") {
-    console.log("reached 1");
     if (powerups.powerupsCount.slowMo > 0 && slowMo === false) {
-      console.log("reached 2");
       powerups.powerupsCount.slowMo -= 1;
       handleSlowMo();
     }
