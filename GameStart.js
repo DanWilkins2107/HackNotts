@@ -22,23 +22,30 @@ let score;
 let activeBlocks = [];
 let activePowerups = [];
 let shielded = false;
+let slowMo = false;
+let turbo = false;
 let gameLoop;
 let blockIncreaseSpeed;
 let highScore;
 let playerSpeedMultiplier;
 let blockSpeedMultiplier;
+let blockSpawnMultiplier;
 let gameRun = 0;
 
 function addBlockToArray(assignedGame) {
   let block = new createBlock(30, 30, canvasWidth, canvasHeight);
   activeBlocks.push(block);
-  setTimeout(() => {checkBlockToArrayGameEnd(assignedGame)}, 1000/blockSpeedMultiplier ** 4);
+  setTimeout(() => {
+    checkBlockToArrayGameEnd(assignedGame);
+  }, 1000 / blockSpawnMultiplier ** 4);
 }
 
 function addPowerupToArray(assignedGame) {
   let powerup = new createPowerup(30, 30, canvasWidth, canvasHeight);
   activePowerups.push(powerup);
-  setTimeout(() => {checkPowerupToArrayGameEnd(assignedGame)}, 3000/blockSpeedMultiplier ** 4);
+  setTimeout(() => {
+    checkPowerupToArrayGameEnd(assignedGame);
+  }, 3000 / blockSpawnMultiplier ** 4);
 }
 
 function checkBlockToArrayGameEnd(assignedGame) {
@@ -64,19 +71,25 @@ function startGame() {
 function startGameLoop() {
   clearInterval(blockIncreaseSpeed);
   clearInterval(gameLoop);
+  shielded = false;
+  slowMo = false;
+  turbo = false;
   blockSpeedMultiplier = 1;
+  blockSpawnMultiplier = 1;
   gameRun += 1;
-  blockIncreaseSpeed = setInterval(blockSpeedUp, 10000);
+  blockIncreaseSpeed = setInterval(increaseBlockRates, 10000);
   gameLoop = setInterval(updateCanvas, 10);
   addBlockToArray(gameRun);
   addPowerupToArray(gameRun);
 }
 
-function blockSpeedUp() {
-  if (blockSpeedMultiplier < 2) {
+function increaseBlockRates() {
+  if (blockSpawnMultiplier < 2) {
     blockSpeedMultiplier *= 1.1;
+    blockSpawnMultiplier *= 1.1;
   } else {
     blockSpeedMultiplier *= 1.05;
+    blockSpawnMultiplier *= 1.05;
   }
 }
 
@@ -112,7 +125,6 @@ function drawCanvas(ctx) {
 function stopGame(ctx) {
   clearInterval(gameLoop);
   highScore = score.saveScore();
-  console.log(highScore);
   gameEndScreen(ctx, highScore);
 }
 
@@ -159,7 +171,6 @@ function detectCollision() {
         shielded = false;
         player.colour = "green";
         let index = activeBlocks.indexOf(block);
-        // Only take out the one block
         activeBlocks.splice(index, 1);
         break;
       }
@@ -173,20 +184,36 @@ function detectCollision() {
 }
 
 function handleTurbo() {
-  //pass
+  turbo = true;
+  setTimeout(() => {
+    turbo = false;
+  }, 5000);
 }
 
 function handleSlowMo() {
-  //pass
+  slowMo = true;
+  playerSpeedMultiplier *= 0.5;
+  blockSpeedMultiplier *= 0.5;
+  setTimeout(() => {
+    slowMo = false;
+    playerSpeedMultiplier *= 2;
+    blockSpeedMultiplier *= 2;
+  }, 5000);
 }
 
 function handleShield() {
   shielded = true;
-  //player.colour = "#aaff00";
 }
 
 function handleBomb() {
-  activeBlocks = [];
+  activeBlocks = activeBlocks.filter((block) => {
+    return (
+      block.x < player.x - 200 ||
+      block.x > player.x + 200 ||
+      block.y < player.y - 200 ||
+      block.y > player.y + 200
+    );
+  });
 }
 
 let keyMap = {
@@ -208,7 +235,7 @@ document.addEventListener("keydown", (event) => {
       keysPressed[keyMap.left[1]]) &&
     player.x > 0
   ) {
-    player.x -= 10;
+    player.x -= turbo === true ? 20 : 10;
   }
 
   if (
@@ -217,7 +244,7 @@ document.addEventListener("keydown", (event) => {
       keysPressed[keyMap.right[1]]) &&
     player.x < canvasWidth - player.width
   ) {
-    player.x += 10;
+    player.x += turbo === true ? 20 : 10;
   }
 
   if (
@@ -226,7 +253,7 @@ document.addEventListener("keydown", (event) => {
       keysPressed[keyMap.up[1]]) &&
     player.y > 0
   ) {
-    player.y -= 10;
+    player.y -= turbo === true ? 20 : 10;
   }
 
   if (
@@ -235,24 +262,24 @@ document.addEventListener("keydown", (event) => {
       keysPressed[keyMap.down[1]]) &&
     player.y < canvasHeight - player.height
   ) {
-    player.y += 10;
+    player.y += turbo === true ? 20 : 10;
   }
 
   //  Powerup handling
   if (event.key === "1") {
-    if (powerups.powerupsCount.turbo > 0) {
+    if (powerups.powerupsCount.turbo > 0 && turbo === false) {
       powerups.powerupsCount.turbo -= 1;
       handleTurbo();
     }
   }
-
   if (event.key === "2") {
-    if (powerups.powerupsCount.slowMo > 0) {
+    console.log("reached 1");
+    if (powerups.powerupsCount.slowMo > 0 && slowMo === false) {
+      console.log("reached 2");
       powerups.powerupsCount.slowMo -= 1;
       handleSlowMo();
     }
   }
-
   if (event.key === "3") {
     if (powerups.powerupsCount.shield > 0 && shielded === false) {
       powerups.powerupsCount.shield -= 1;
