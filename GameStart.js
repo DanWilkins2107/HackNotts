@@ -49,7 +49,16 @@ function startGameLoop() {
 
 function updateCanvas() {
   if (!detectCollision()) {
-    ctx = gameCanvas.context;
+    drawCanvas();
+    score.draw();
+    powerups.draw();
+  } else {
+    stopGame();
+  }
+}
+
+function drawCanvas() {
+  ctx = gameCanvas.context;
     ctx.clearRect(0, 0, canvasWidth, canvasHeight);
     player.draw();
     for (let block of activeBlocks) {
@@ -63,11 +72,6 @@ function updateCanvas() {
       powerup.contact();
       powerup.draw();
     }
-    score.draw();
-    powerups.draw();
-  } else {
-    stopGame();
-  }
 }
 
 function stopGame() {
@@ -80,7 +84,8 @@ function stopGame() {
 
 function gameEndScreen(highScore) {
   ctx = gameCanvas.context;
-  //ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+  ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+  drawCanvas();
   ctx.fillStyle = "#505d6b85";
   ctx.fillRect(30, 20, canvasWidth - 60, canvasHeight - 40);
   ctx.font = "75px Arial";
