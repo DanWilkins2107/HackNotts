@@ -14,8 +14,8 @@ export class createPowerup {
 		}
 	};
 
-	move() {
-		this.x -= 1;
+	move(speedMultiplier) {
+		this.x -= 1 * speedMultiplier;
 	};
 
 	draw(ctx) {

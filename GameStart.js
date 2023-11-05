@@ -96,13 +96,13 @@ function drawCanvas(ctx) {
   player.draw(ctx, shielded);
 
   for (let block of activeBlocks) {
-    block.move();
+    block.move(blockSpeedMultiplier);
     block.delete(activeBlocks);
     block.draw(ctx);
   }
 
   for (let powerup of activePowerups) {
-    powerup.move();
+    powerup.move(blockSpeedMultiplier);
     powerup.delete(activePowerups);
     powerup.contact(player, powerups, activePowerups);
     powerup.draw(ctx);
