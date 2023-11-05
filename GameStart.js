@@ -20,8 +20,6 @@ let shielded = false;
 let gameLoop;
 let newBlock;
 let newPowerup;
-let score;
-let powerups;
 let highScore;
 
 function addBlockToArray() {
@@ -63,14 +61,19 @@ function updateCanvas() {
 
 function drawCanvas() {
   ctx = gameCanvas.context;
-    ctx.clearRect(0, 0, canvasWidth, canvasHeight);
-    player.draw();
-    for (let powerup of activePowerups) {
-      powerup.move();
-      powerup.delete();
-      powerup.contact();
-      powerup.draw();
-    }
+  ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+  player.draw();
+  for (let block of activeBlocks) {
+    block.move();
+    block.delete();
+    block.draw();
+  }
+  for (let powerup of activePowerups) {
+    powerup.move();
+    powerup.delete();
+    powerup.contact();
+    powerup.draw();
+  }
 }
 
 function stopGame() {
@@ -135,27 +138,27 @@ function detectCollision() {
 
 function handleTurbo() {
   //pass
-};
+}
 
 function handleSlowMo() {
   //pass
-};
+}
 
 function handleShield() {
   shielded = true;
   //player.colour = "#aaff00";
-};
+}
 
 function handleBomb() {
   activeBlocks = [];
-};
+}
 
 function createPlayer(width, height, x, y) {
   this.width = width;
   this.height = height;
   this.x = x;
   this.y = y;
-  this.colour = "#008000"
+  this.colour = "#008000";
 
   this.draw = function () {
     ctx = gameCanvas.context;
