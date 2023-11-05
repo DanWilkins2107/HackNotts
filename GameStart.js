@@ -80,7 +80,6 @@ function updateCanvas() {
     drawCanvas();
     score.draw();
     powerups.draw();
-    console.log(activeBlocks.length)
   } else {
     stopGame();
   }
