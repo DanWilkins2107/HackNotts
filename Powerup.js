@@ -6,6 +6,8 @@ export class createPowerup {
 		this.y = Math.floor(Math.random() * canvasHeight - 20) + 10;
 		const powerupTypes = ["turbo", "slowMo", "shield", "bomb"];
 		this.powerupType = powerupTypes[Math.floor(Math.random() * 4)];
+		this.icon = new Image();
+		this.icon.src = `./images/${this.powerupType}.svg`;
 	}
 
 	delete(activePowerups) {
@@ -19,17 +21,7 @@ export class createPowerup {
 	};
 
 	draw(ctx) {
-		if (this.powerupType === "turbo") {
-			ctx.fillStyle = "blue";
-		} else if (this.powerupType === "slowMo") {
-			ctx.fillStyle = "yellow";
-		} else if (this.powerupType === "shield") {
-			ctx.fillStyle = "purple";
-		} else if (this.powerupType === "bomb") {
-			ctx.fillStyle = "orange";
-		}
-
-		ctx.fillRect(this.x, this.y, this.width, this.height);
+		ctx.drawImage(this.icon, this.x, this.y, this.width, this.height);
 	};
 
 	contact(player, powerups, activePowerups) {
