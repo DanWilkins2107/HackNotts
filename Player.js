@@ -7,6 +7,21 @@ export default class createPlayer {
     this.colour = "#008000";
   }
 
+  move(ctx, playerSpeedMultiplier, keysPressed) {
+    if (("a" in keysPressed || "ArrowLeft" in keysPressed) && this.x > 0) {
+      this.x -= 1 * playerSpeedMultiplier;
+    }
+    if (("d" in keysPressed || "ArrowRight" in keysPressed) && this.x < ctx.canvas.width - this.width) {
+      this.x += 1 * playerSpeedMultiplier;
+    }
+    if (("w" in keysPressed || "ArrowUp" in keysPressed) && this.y > 0) {
+      this.y -= 1 * playerSpeedMultiplier;
+    }
+    if (("s" in keysPressed || "ArrowDown" in keysPressed) && this.y < ctx.canvas.height - this.height) {
+      this.y += 1 * playerSpeedMultiplier;
+    }
+  }
+
   draw(ctx, shielded) {
     if (shielded === true) {
       ctx.fillStyle = "white";

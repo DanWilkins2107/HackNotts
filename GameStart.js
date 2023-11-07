@@ -76,6 +76,7 @@ function startGameLoop() {
     turbo = false;
     blockSpeedMultiplier = 1;
     blockSpawnMultiplier = 1;
+    playerSpeedMultiplier = 1;
     gameRun += 1;
     blockIncreaseSpeed = setInterval(increaseBlockRates, 10000);
     gameLoop = setInterval(updateCanvas, 10);
@@ -119,7 +120,7 @@ function drawCanvas(ctx) {
         powerup.contact(player, powerups, activePowerups);
         powerup.draw(ctx);
     }
-
+    player.move(ctx, playerSpeedMultiplier, keysPressed);
     player.draw(ctx, shielded);
 }
 
@@ -186,8 +187,10 @@ function detectCollision() {
 
 function handleTurbo() {
     turbo = true;
+    playerSpeedMultiplier *= 2;
     setTimeout(() => {
         turbo = false;
+        playerSpeedMultiplier *= 0.5;
     }, 5000);
 }
 
@@ -217,53 +220,10 @@ function handleBomb() {
     });
 }
 
-let keyMap = {
-    left: ["a", "ArrowLeft"],
-    right: ["d", "ArrowRight"],
-    up: ["w", "ArrowUp"],
-    down: ["s", "ArrowDown"],
-};
-
 let keysPressed = {};
 
 document.addEventListener("keydown", (event) => {
     keysPressed[event.key] = true;
-
-    //  Direction handling
-    if (
-        (keyMap.left.includes(event.key) ||
-            keysPressed[keyMap.left[0]] ||
-            keysPressed[keyMap.left[1]]) &&
-        player.x > 0
-    ) {
-        player.x -= turbo === true ? 20 : 10;
-    }
-
-    if (
-        (keyMap.right.includes(event.key) ||
-            keysPressed[keyMap.right[0]] ||
-            keysPressed[keyMap.right[1]]) &&
-        player.x < canvasWidth - player.width
-    ) {
-        player.x += turbo === true ? 20 : 10;
-    }
-
-    if (
-        (keyMap.up.includes(event.key) || keysPressed[keyMap.up[0]] || keysPressed[keyMap.up[1]]) &&
-        player.y > 0
-    ) {
-        player.y -= turbo === true ? 20 : 10;
-    }
-
-    if (
-        (keyMap.down.includes(event.key) ||
-            keysPressed[keyMap.down[0]] ||
-            keysPressed[keyMap.down[1]]) &&
-        player.y < canvasHeight - player.height
-    ) {
-        player.y += turbo === true ? 20 : 10;
-    }
-
     //  Powerup handling
     if (event.key === "1") {
         if (powerups.powerupsCount.turbo > 0 && turbo === false) {
@@ -283,7 +243,6 @@ document.addEventListener("keydown", (event) => {
             handleShield();
         }
     }
-
     if (event.key === "4") {
         if (powerups.powerupsCount.bomb > 0) {
             powerups.powerupsCount.bomb -= 1;
