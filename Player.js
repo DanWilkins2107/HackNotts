@@ -22,8 +22,8 @@ export default class createPlayer {
     }
   }
 
-  draw(ctx, shielded) {
-    if (shielded === true) {
+  draw(ctx, currentPowerup) {
+    if (currentPowerup === "shield") {
       ctx.fillStyle = "white";
       ctx.fillRect(this.x - 2, this.y - 2, this.width + 4, this.height + 4);
     }
