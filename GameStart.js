@@ -1,6 +1,6 @@
 import createPlayer from "./Player.js";
 import createBlock from "./Block.js";
-import { createPowerup, createPowerupBoard } from "./Powerup.js";
+import { createPowerup, createPowerupBoard, createPowerupBar } from "./Powerup.js";
 import createTimeLabel from "./Timer.js";
 
 const canvasWidth = 600;
@@ -17,13 +17,14 @@ let gameCanvas = {
 };
 
 let player;
-let powerups;
+let powerupBoard;
+let powerupBar;
+let currentPowerup;
+let powerupTimeRemaining;
+let powerupTimeTotal;
 let score;
 let activeBlocks = [];
 let activePowerups = [];
-let shielded = false;
-let slowMo = false;
-let turbo = false;
 let gameLoop;
 let blockIncreaseSpeed;
 let highScore;
@@ -64,16 +65,16 @@ function startGame() {
     gameCanvas.start();
     player = new createPlayer(30, 30, 10, 120);
     score = new createTimeLabel();
-    powerups = new createPowerupBoard();
+    powerupBoard = new createPowerupBoard();
+    powerupBar = new createPowerupBar();
     startGameLoop();
 }
 
 function startGameLoop() {
     clearInterval(blockIncreaseSpeed);
     clearInterval(gameLoop);
-    shielded = false;
-    slowMo = false;
-    turbo = false;
+    currentPowerup = null;
+    powerupTimeRemaining = 0;
     blockSpeedMultiplier = 1;
     blockSpawnMultiplier = 1;
     playerSpeedMultiplier = 1;
@@ -99,7 +100,11 @@ function updateCanvas() {
     if (!detectCollision()) {
         drawCanvas(ctx);
         score.draw(ctx);
-        powerups.draw(ctx);
+        powerupBoard.draw(ctx);
+        if (powerupTimeRemaining > 0) {
+            powerupBar.draw(ctx, powerupTimeRemaining, powerupTimeTotal, currentPowerup);
+            powerupTimeRemaining -= 10;
+        }
     } else {
         stopGame(ctx);
     }
@@ -117,11 +122,12 @@ function drawCanvas(ctx) {
     for (let powerup of activePowerups) {
         powerup.move(blockSpeedMultiplier);
         powerup.delete(activePowerups);
-        powerup.contact(player, powerups, activePowerups);
+        powerup.contact(player, powerupBoard, activePowerups);
         powerup.draw(ctx);
     }
+
     player.move(ctx, playerSpeedMultiplier, keysPressed);
-    player.draw(ctx, shielded);
+    player.draw(ctx, currentPowerup);
 }
 
 function stopGame(ctx) {
@@ -169,8 +175,8 @@ function detectCollision() {
             player.y < block.y + block.height &&
             player.y + player.height > block.y
         ) {
-            if (shielded === true) {
-                shielded = false;
+            if (currentPowerup === "shield") {
+                currentPowerup = null;
                 player.colour = "green";
                 let index = activeBlocks.indexOf(block);
                 activeBlocks.splice(index, 1);
@@ -186,27 +192,36 @@ function detectCollision() {
 }
 
 function handleTurbo() {
-    turbo = true;
+    currentPowerup = "turbo";
+    powerupTimeRemaining = 5000;
+    powerupTimeTotal = 5000;
     playerSpeedMultiplier *= 2;
     setTimeout(() => {
-        turbo = false;
+        currentPowerup = null;
         playerSpeedMultiplier *= 0.5;
     }, 5000);
 }
 
 function handleSlowMo() {
-    slowMo = true;
+    currentPowerup = "slowMo";
+    powerupTimeRemaining = 5000;
+    powerupTimeTotal = 5000;
     playerSpeedMultiplier *= 0.5;
     blockSpeedMultiplier *= 0.5;
     setTimeout(() => {
-        slowMo = false;
+        currentPowerup = null;
         playerSpeedMultiplier *= 2;
         blockSpeedMultiplier *= 2;
     }, 5000);
 }
 
 function handleShield() {
-    shielded = true;
+    powerupTimeRemaining = 5000;
+    powerupTimeTotal = 5000;
+    currentPowerup = "shield";
+    setTimeout(() => {
+        currentPowerup = null;
+    }, 5000);
 }
 
 function handleBomb() {
@@ -226,26 +241,26 @@ document.addEventListener("keydown", (event) => {
     keysPressed[event.key] = true;
     //  Powerup handling
     if (event.key === "1") {
-        if (powerups.powerupsCount.turbo > 0 && turbo === false) {
-            powerups.powerupsCount.turbo -= 1;
+        if (powerupBoard.powerupsCount.turbo > 0 && currentPowerup === null) {
+            powerupBoard.powerupsCount.turbo -= 1;
             handleTurbo();
         }
     }
     if (event.key === "2") {
-        if (powerups.powerupsCount.slowMo > 0 && slowMo === false) {
-            powerups.powerupsCount.slowMo -= 1;
+        if (powerupBoard.powerupsCount.slowMo > 0 && currentPowerup === null) {
+            powerupBoard.powerupsCount.slowMo -= 1;
             handleSlowMo();
         }
     }
     if (event.key === "3") {
-        if (powerups.powerupsCount.shield > 0 && shielded === false) {
-            powerups.powerupsCount.shield -= 1;
+        if (powerupBoard.powerupsCount.shield > 0 && currentPowerup === null) {
+            powerupBoard.powerupsCount.shield -= 1;
             handleShield();
         }
     }
     if (event.key === "4") {
-        if (powerups.powerupsCount.bomb > 0) {
-            powerups.powerupsCount.bomb -= 1;
+        if (powerupBoard.powerupsCount.bomb > 0 && currentPowerup === null) {
+            powerupBoard.powerupsCount.bomb -= 1;
             handleBomb();
         }
     }

@@ -71,3 +71,29 @@ export class createPowerupBoard {
         ctx.fillText(this.powerupsCount.bomb, this.x + 265, this.y + 65);
     }
 }
+
+export class createPowerupBar {
+    constructor() {
+        this.x = 150;
+        this.y = 15;
+        this.shield = new Image();
+        this.shield.src = "./images/shield.svg";
+        this.turbo = new Image();
+        this.turbo.src = "./images/turbo.svg";
+        this.slowMo = new Image();
+        this.slowMo.src = "./images/slowMo.svg";
+    }
+    draw(ctx, powerupTimeRemaining, powerupTimeTotal, powerupType) {
+        ctx.fillStyle = "#FFFFFF80";
+        ctx.fillRect(this.x, this.y, 100, 17);
+        ctx.fillStyle = "white";
+        ctx.fillRect(this.x, this.y, (powerupTimeRemaining / powerupTimeTotal) * 100, 17);
+        if (powerupType === "turbo") {
+            ctx.drawImage(this.turbo, this.x - 25, this.y - 5, 25, 25);
+        } else if (powerupType === "slowMo") {
+            ctx.drawImage(this.slowMo, this.x - 25, this.y - 5, 25, 25);
+        } else if (powerupType === "shield") {
+            ctx.drawImage(this.shield, this.x - 25, this.y - 5, 25, 25);
+        }
+    }
+}
