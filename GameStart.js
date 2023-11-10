@@ -135,7 +135,7 @@ function drawCanvas(ctx) {
     for (let block of activeBlocks) {
         block.move(blockSpeedMultiplier);
         block.delete(activeBlocks);
-        block.draw(ctx);
+        block.draw(ctx, currentPowerup);
     }
 
     for (let powerup of activePowerups) {
