@@ -12,7 +12,8 @@ let gameCanvas = {
         this.canvas.width = canvasWidth;
         this.canvas.height = canvasHeight;
         this.context = this.canvas.getContext("2d");
-        document.body.appendChild(this.canvas);
+        const gameContainer = document.getElementById("canvas");
+        gameContainer.appendChild(this.canvas);
     },
 };
 

@@ -1,17 +1,60 @@
 body {
-    background-color: #b2d8d8;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+    margin: 0;
+    padding: 0;
+    background-color: #7a93dc;
+    color: #ffffff;
+    text-align: left;
+    display: grid;
+    grid-template-columns: 1fr 600px 1fr;
+    grid-template-rows: auto 400px auto;
+    grid-template-areas: 
+        "title title title"
+        ". canvas controls"
+        ". about .";
 }
 
-h1 {
+p {
+    margin-block: 5px;
+}
+
+h2 {
+    margin-block: 10px;
+}
+
+p.indent {
+    text-indent: 20px;
+    margin-block: 2px;
+}
+
+.canvas {
+    grid-area: canvas;
+    width: 600px;
+    height: 400px;
+    margin-top: -3px;
+    margin-left: -3px;
+    border: 5px solid #ed9b33;
+    background-color: #051c2c;
+}
+
+.title {
     font-family: "Roboto", sans-serif;
-    font-size: 3em;
+    background-color: #3f2a56;
+    grid-area: title;
+    font-size: 28px;
+    text-align: center;
+    width: 100vw;
+    margin-bottom: 20px;
 }
 
-canvas {
-    border: 3px solid black;
-    background-color: #000080;
+.controls {
+    font-family: Arial, Helvetica, sans-serif;
+    grid-area: controls;
+    margin-left: 15px;
+}
+
+.about {
+    font-family: Arial, Helvetica, sans-serif;
+    grid-area: about;
+    margin-top: 5px;
+    margin-left: 10px;
 }

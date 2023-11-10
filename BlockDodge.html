@@ -4,12 +4,39 @@
   <head>
     <title>Block Dodge</title>
     <link rel="stylesheet" href="block-dodge.css">
+    <script type="module" src="GameStart.js"></script>
   </head>
   <body>
-    <div id="canvas"></div>
-    <body>
+    <div class="title">
       <h1>Block Dodge</h1>
-      <script type="module" src="GameStart.js"></script>
-    </body>
+    </div>
+    <div id="canvas" class="canvas"></div>
+    <div class="controls">
+      <h2>Controls</h2>
+      <h2>Movement</h2>
+      <p class="indent"><b>Left Arrow / A</b> - Move left</p>
+      <p class="indent"><b>Right Arrow / D</b> - Move right</p>
+      <p class="indent"><b>Up Arrow / W</b> - Move up</p>
+      <p class="indent"><b>Down Arrow / S</b> - Move down</p>
+      <h2>Powerups</h2>
+      <p class="indent"><b>1</b> - Turbo mode</p>
+      <p class="indent"><b>2</b> - Slow Mo</p>
+      <p class="indent"><b>3</b> - Shield</p>
+      <p class="indent"><b>4</b> - Bomb</p>
+    </div>
+    <div class="about">
+      <h2>How to play</h2>
+      <p>
+        Use the arrow keys to move the player around the screen.
+        The aim of the game is to avoid the blocks for as long as possible.
+        The blocks will speed up over the course of the game, so be careful!
+      </p>
+      <h2>Powerups</h2>
+      <p>There are 4 powerups in the game, each with their own unique effect.<br></p>
+      <p class="indent"><b>Turbo mode</b> - Speeds up the player.</p>
+      <p class="indent"><b>Slow Mo</b> - Slows down the all the blocks.</p>
+      <p class="indent"><b>Shield</b> - Makes the player invincible to hitting 1 block.</p>
+      <p class="indent"><b>Bomb</b> - Destroys blocks in a radius around the player.</p>
+    </div>
   </body>
 </html>
