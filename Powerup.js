@@ -10,14 +10,18 @@ export class createPowerup {
         this.icon.src = `./images/${this.powerupType}.svg`;
     }
 
-    delete(activePowerups) {
+    delete(activePowerupBlocks) {
         if (this.x < -100) {
-            activePowerups.shift();
+            activePowerupBlocks.shift();
         }
     }
 
-    move(speedMultiplier) {
-        this.x -= 1.25 * speedMultiplier;
+    move(blockSpeedMultiplier, activePowerups) {
+        let blockSpeed = blockSpeedMultiplier;
+        if (activePowerups.some((powerup) => powerup[0] === "slowMo")) {
+            blockSpeed *= 0.5;
+        }
+        this.x -= blockSpeed;
     }
 
     draw(ctx) {
@@ -93,17 +97,15 @@ export class createPowerupBar {
         this.slowMo = new Image();
         this.slowMo.src = "./images/slowMo.svg";
     }
-    draw(ctx, powerupTimeRemaining, powerupTimeTotal, powerupType) {
-        ctx.fillStyle = "#FFFFFF80";
-        ctx.fillRect(this.x, this.y, 100, 17);
-        ctx.fillStyle = "white";
-        ctx.fillRect(this.x, this.y, (powerupTimeRemaining / powerupTimeTotal) * 100, 17);
-        if (powerupType === "turbo") {
-            ctx.drawImage(this.turbo, this.x - 25, this.y - 5, 25, 25);
-        } else if (powerupType === "slowMo") {
-            ctx.drawImage(this.slowMo, this.x - 25, this.y - 5, 25, 25);
-        } else if (powerupType === "shield") {
-            ctx.drawImage(this.shield, this.x - 25, this.y - 5, 25, 25);
+    draw(ctx, activePowerups) {
+        let i = 0;
+        for (let powerup of activePowerups) {
+            ctx.fillStyle = "#FFFFFF80";
+            ctx.fillRect(this.x, this.y + 30*i, 100, 17);
+            ctx.drawImage(this[powerup[0]], this.x - 25, this.y - 5 + 30*i, 25, 25)
+            ctx.fillStyle = "white";
+            ctx.fillRect(this.x, this.y + 30*i, (powerup[1] / 5000) * 100, 17);
+            i++;
         }
     }
 }
