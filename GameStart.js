@@ -260,6 +260,10 @@ function explodeBomb(radius) {
 let keysPressed = {};
 
 document.addEventListener("keydown", (event) => {
+    // Disable Arrow Keys moving the page
+    if (event.key === "ArrowLeft" || event.key === "ArrowRight" || event.key === "ArrowUp" || event.key === "ArrowDown") {
+        event.preventDefault();
+    }
     keysPressed[event.key] = true;
     //  Powerup handling
     if (event.key === "1") {
