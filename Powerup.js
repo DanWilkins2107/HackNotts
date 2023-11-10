@@ -45,6 +45,8 @@ export class createPowerupBoard {
         this.x = 300;
         this.y = 0;
 
+        this.powerupNames = ["Turbo", "Slow Mo", "Shield", "Bomb"];
+
         this.powerupsCount = {
             turbo: 0,
             slowMo: 0,
@@ -54,21 +56,29 @@ export class createPowerupBoard {
     }
 
     draw(ctx) {
-        ctx.font = "20px Arial";
         ctx.fillStyle = "#FFFFFF80";
         ctx.fillRect(this.x, this.y, 300, 75);
+
         ctx.fillStyle = "white";
-        ctx.fillText("Powerups", this.x + 120, this.y + 20);
-        ctx.font = "15px Arial";
-        ctx.fillText("Turbo", this.x + 10, this.y + 40);
-        ctx.fillText("Slow Mo", this.x + 80, this.y + 40);
-        ctx.fillText("Shield", this.x + 170, this.y + 40);
-        ctx.fillText("Bomb ", this.x + 250, this.y + 40);
+        ctx.textAlign = "center";
         ctx.font = "20px Arial";
-        ctx.fillText(this.powerupsCount.turbo, this.x + 24, this.y + 65);
-        ctx.fillText(this.powerupsCount.slowMo, this.x + 105, this.y + 65);
-        ctx.fillText(this.powerupsCount.shield, this.x + 185, this.y + 65);
-        ctx.fillText(this.powerupsCount.bomb, this.x + 265, this.y + 65);
+        ctx.fillText("Powerups", this.x + 150, this.y + 20);
+
+        Object.keys(this.powerupsCount).map((val, i) => {
+            if (this.powerupsCount[val] >= 3) {
+                ctx.fillStyle = "red";
+            } else {
+                ctx.fillStyle = "white";
+            }
+
+            ctx.font = "15px Arial";
+            ctx.fillText(this.powerupNames[i], this.x + 42 + i * 75, this.y + 40);
+
+            ctx.font = "20px Arial";
+            ctx.fillText(this.powerupsCount[val], this.x + 42 + i * 75, this.y + 65);
+        });
+
+        ctx.textAlign = "start";
     }
 }
 
