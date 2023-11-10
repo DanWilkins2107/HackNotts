@@ -17,7 +17,7 @@ export class createPowerup {
     }
 
     move(blockSpeedMultiplier, activePowerups) {
-        let blockSpeed = blockSpeedMultiplier;
+        let blockSpeed = 1.25 * blockSpeedMultiplier;
         if (activePowerups.some((powerup) => powerup[0] === "slowMo")) {
             blockSpeed *= 0.5;
         }
