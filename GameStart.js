@@ -99,35 +99,12 @@ function increaseBlockRates() {
 
 function updateCanvas() {
     let ctx = gameCanvas.context;
-    console.log(activePowerups)
     if (!detectCollision()) {
         drawCanvas(ctx);
         score.draw(ctx);
         powerupBoard.draw(ctx);
-        if (activePowerups.length > 0) {
-            powerupBars.draw(ctx, activePowerups);
-            for (let powerup of activePowerups) {
-                powerup[1] -= 10;
-                if (powerup[1] <= 0) {
-                    let index = activePowerups.indexOf(powerup);
-                    activePowerups.splice(index, 1);
-                }
-            }
-        }
-        if (bombActive) {
-            if ("4" in keysPressed) {
-                bombRadius += bombDirection;
-                drawBomb(ctx, player, bombRadius)
-                if (bombRadius === 200) {
-                    bombDirection = -1;
-                } else if (bombRadius === 0) {
-                    bombDirection = 1;
-                }
-            }
-            else {
-                explodeBomb(bombRadius);
-            }
-        }
+        lowerPowerupCount(ctx, activePowerups);
+        checkBomb(ctx);
     } else {
         stopGame(ctx);
     }
@@ -150,6 +127,19 @@ function drawCanvas(ctx) {
 
     player.move(ctx, playerSpeedMultiplier, keysPressed, activePowerups);
     player.draw(ctx, activePowerups);
+}
+
+function lowerPowerupCount(ctx, activePowerups) {
+    if (activePowerups.length > 0) {
+        powerupBars.draw(ctx, activePowerups);
+        for (let powerup of activePowerups) {
+            powerup[1] -= 10;
+            if (powerup[1] <= 0) {
+                let index = activePowerups.indexOf(powerup);
+                activePowerups.splice(index, 1);
+            }
+        }
+    }
 }
 
 function stopGame(ctx) {
@@ -213,29 +203,11 @@ function detectCollision() {
     return collisionDetected;
 }
 
-function handleTurbo() {
-    activePowerups.push(["turbo", 5000]);
+function handlePowerups(powerupString) {
+    activePowerups.push([powerupString, 5000]);
     setTimeout(() => {
         activePowerups = activePowerups.filter((powerup) => {
-            return powerup[0] !== "turbo";
-        });
-    }, 5000);
-}
-
-function handleSlowMo() {
-    activePowerups.push(["slowMo", 5000]);
-    setTimeout(() => {
-        activePowerups = activePowerups.filter((powerup) => {
-            return powerup[0] !== "slowMo";
-        });
-    }, 5000);
-}
-
-function handleShield() {
-    activePowerups.push(["shield", 5000]);
-    setTimeout(() => {
-        activePowerups = activePowerups.filter((powerup) => {
-            return powerup[0] !== "shield";
+            return powerup[0] !== powerupString;
         });
     }, 5000);
 }
@@ -246,11 +218,25 @@ function handleBomb() {
     bombRadius = 0;
 }
 
+function checkBomb(ctx) {
+    if (bombActive) {
+        if ("4" in keysPressed) {
+            bombRadius += bombDirection;
+            drawBomb(ctx, player, bombRadius);
+            if (bombRadius === 200) {
+                bombDirection = -1;
+            } else if (bombRadius === 0) {
+                bombDirection = 1;
+            }
+        } else {
+            explodeBomb(bombRadius);
+        }
+    }
+}
+
 function explodeBomb(radius) {
     activeBlocks = activeBlocks.filter((block) => {
-        return (
-            radius < Math.sqrt((block.x - player.x) ** 2 + (block.y - player.y) ** 2)
-        );
+        return radius < Math.sqrt((block.x - player.x) ** 2 + (block.y - player.y) ** 2);
     });
     bombActive = false;
 }
@@ -259,25 +245,39 @@ let keysPressed = {};
 
 document.addEventListener("keydown", (event) => {
     // Disable Arrow Keys moving the page
-    if (event.key === "ArrowLeft" || event.key === "ArrowRight" || event.key === "ArrowUp" || event.key === "ArrowDown") {
+    if (
+        event.key === "ArrowLeft" ||
+        event.key === "ArrowRight" ||
+        event.key === "ArrowUp" ||
+        event.key === "ArrowDown"
+    ) {
         event.preventDefault();
     }
     keysPressed[event.key] = true;
-    //  Powerup handling
-    if (event.key === "1" && powerupBoard.powerupsCount.turbo > 0 && !activePowerups.some((powerup) => powerup[0] === "turbo")) {
+    if (
+        event.key === "1" &&
+        powerupBoard.powerupsCount.turbo > 0 &&
+        !activePowerups.some((powerup) => powerup[0] === "turbo")
+    ) {
         powerupBoard.powerupsCount.turbo -= 1;
-        handleTurbo();
+        handlePowerups("turbo");
     }
-    if (event.key === "2" && powerupBoard.powerupsCount.slowMo > 0 && !activePowerups.some((powerup) => powerup[0] === "slowMo")) {
-        if (powerupBoard.powerupsCount.slowMo > 0) {
-            powerupBoard.powerupsCount.slowMo -= 1;
-            handleSlowMo();
-        }
+    if (
+        event.key === "2" &&
+        powerupBoard.powerupsCount.slowMo > 0 &&
+        !activePowerups.some((powerup) => powerup[0] === "slowMo")
+    ) {
+        powerupBoard.powerupsCount.slowMo -= 1;
+        handlePowerups("slowMo");
     }
-    if (event.key === "3" && powerupBoard.powerupsCount.shield > 0 && !activePowerups.some((powerup) => powerup[0] === "shield")) {
+    if (
+        event.key === "3" &&
+        powerupBoard.powerupsCount.shield > 0 &&
+        !activePowerups.some((powerup) => powerup[0] === "shield")
+    ) {
         if (powerupBoard.powerupsCount.shield > 0) {
             powerupBoard.powerupsCount.shield -= 1;
-            handleShield();
+            handlePowerups("shield");
         }
     }
     if (event.key === "4" && powerupBoard.powerupsCount.bomb > 0 && !bombActive) {

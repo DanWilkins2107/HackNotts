@@ -25,7 +25,7 @@ export default class createBlock {
     draw(ctx, activePowerups) {
         ctx.fillStyle = "red";
         ctx.fillRect(this.x, this.y, this.width, this.height);
-				if (activePowerups.some((powerup) => powerup[0] === "freeze")) {
+				if (activePowerups.some((powerup) => powerup[0] === "slowMo")) {
 					ctx.drawImage(this.freeze, this.x - 4, this.y - 4, 1.27 * this.width, 1.27 * this.height);
 				}
     }
