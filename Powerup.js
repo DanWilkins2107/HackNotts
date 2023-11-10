@@ -107,3 +107,10 @@ export class createPowerupBar {
         }
     }
 }
+
+export function drawBomb(ctx, player, radius) {
+    ctx.fillStyle = "#FFA50080";
+    ctx.beginPath();
+    ctx.arc(player.x + player.width/2, player.y+player.width/2, radius, 0, 2 * Math.PI);
+    ctx.fill();
+}
