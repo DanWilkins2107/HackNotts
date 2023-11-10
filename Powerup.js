@@ -45,7 +45,6 @@ export class createPowerupBoard {
         this.x = 300;
         this.y = 0;
 
-        this.powerupTypes = ["turbo", "slowMo", "shield", "bomb"];
         this.powerupNames = ["Turbo", "Slow Mo", "Shield", "Bomb"];
 
         this.powerupsCount = {
@@ -65,19 +64,19 @@ export class createPowerupBoard {
         ctx.font = "20px Arial";
         ctx.fillText("Powerups", this.x + 150, this.y + 20);
 
-        for (let i = 0; i < 4; i++) {
-            if (this.powerupsCount[this.powerupTypes[i]] >= 3) {
+        Object.keys(this.powerupsCount).map((val, i) => {
+            if (this.powerupsCount[val] >= 3) {
                 ctx.fillStyle = "red";
             } else {
                 ctx.fillStyle = "white";
             }
-            
+
             ctx.font = "15px Arial";
-            ctx.fillText(this.powerupNames[i], this.x + 42 + (i * 75), this.y + 40);
+            ctx.fillText(this.powerupNames[i], this.x + 42 + i * 75, this.y + 40);
 
             ctx.font = "20px Arial";
-            ctx.fillText(this.powerupsCount[this.powerupTypes[i]], this.x + 42 + (i * 75), this.y + 65);
-        }
+            ctx.fillText(this.powerupsCount[val], this.x + 42 + i * 75, this.y + 65);
+        });
 
         ctx.textAlign = "start";
     }

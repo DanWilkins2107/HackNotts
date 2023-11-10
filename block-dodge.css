@@ -4,13 +4,19 @@ body {
     background-color: #7a93dc;
     color: #ffffff;
     text-align: left;
-    display: grid;
-    grid-template-columns: 1fr 600px 1fr;
-    grid-template-rows: auto 400px auto;
-    grid-template-areas: 
-        "title title title"
-        ". canvas controls"
-        ". about .";
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: center;
+}
+
+.row {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: center;
+    align-items: center;
+    margin-top: 15px;
 }
 
 p {
@@ -22,39 +28,79 @@ h2 {
 }
 
 p.indent {
-    text-indent: 20px;
+    text-align: left;
     margin-block: 2px;
+    width: fit-content;
 }
 
 .canvas {
-    grid-area: canvas;
     width: 600px;
     height: 400px;
-    margin-top: -3px;
-    margin-left: -3px;
+    justify-self: center;
+    align-self: center;
     border: 5px solid #ed9b33;
     background-color: #051c2c;
 }
 
 .title {
     font-family: "Roboto", sans-serif;
-    background-color: #3f2a56;
-    grid-area: title;
+    background-color: #e0457e;
     font-size: 28px;
     text-align: center;
     width: 100vw;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
+}
+
+h1 {
+    margin: 15px;
+}
+
+h2 {
+    margin: 5px;
 }
 
 .controls {
     font-family: Arial, Helvetica, sans-serif;
-    grid-area: controls;
-    margin-left: 15px;
+    font-size: medium;
+    width: auto;
+    display: flex;
+    flex-direction: column;
+    height: 260px;
+    order: 2;
+    text-align: center;
+    padding: 10px;
+    margin: 5px;
+    border-radius: 0 10px 10px 0;
+    background-color: #ffffff50;
+}
+
+.control-block {
+    display: flex;
+    flex-direction: column;
+    justify-self: center;
+    align-self: center;
+    margin-block: 5px;
 }
 
 .about {
     font-family: Arial, Helvetica, sans-serif;
-    grid-area: about;
-    margin-top: 5px;
-    margin-left: 10px;
+    font-size: medium;
+    width: 580px;
+    height: 260px;
+    order: 1;
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    justify-items: center;
+    align-items: center;
+    padding: 10px;
+    margin: 5px;
+    border-radius: 10px 0 0 10px;
+    background: #ffffff50;
+}
+
+.powerups {
+    width: fit-content;
+    justify-self: center;
+    align-self: center;
 }
