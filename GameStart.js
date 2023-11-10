@@ -1,6 +1,6 @@
 import createPlayer from "./Player.js";
 import createBlock from "./Block.js";
-import { createPowerup, createPowerupBoard, createPowerupBar } from "./Powerup.js";
+import { createPowerup, createPowerupBoard, createPowerupBar, drawBomb } from "./Powerup.js";
 import createTimeLabel from "./Timer.js";
 
 const canvasWidth = 600;
@@ -23,6 +23,9 @@ let powerupBar;
 let currentPowerup;
 let powerupTimeRemaining;
 let powerupTimeTotal;
+let bombActive;
+let bombRadius;
+let bombDirection;
 let score;
 let activeBlocks = [];
 let activePowerups = [];
@@ -80,6 +83,7 @@ function startGameLoop() {
     blockSpawnMultiplier = 1;
     playerSpeedMultiplier = 1;
     gameRun += 1;
+    bombActive = false;
     blockIncreaseSpeed = setInterval(increaseBlockRates, 10000);
     gameLoop = setInterval(updateCanvas, 10);
     addBlockToArray(gameRun);
@@ -105,6 +109,20 @@ function updateCanvas() {
         if (powerupTimeRemaining > 0) {
             powerupBar.draw(ctx, powerupTimeRemaining, powerupTimeTotal, currentPowerup);
             powerupTimeRemaining -= 10;
+        }
+        if (bombActive) {
+            if ("4" in keysPressed) {
+                bombRadius += bombDirection;
+                drawBomb(ctx, player, bombRadius)
+                if (bombRadius === 200) {
+                    bombDirection = -1;
+                } else if (bombRadius === 0) {
+                    bombDirection = 1;
+                }
+            }
+            else {
+                explodeBomb(bombRadius);
+            }
         }
     } else {
         stopGame(ctx);
@@ -183,7 +201,6 @@ function detectCollision() {
                 activeBlocks.splice(index, 1);
                 break;
             }
-
             collisionDetected = true;
             break;
         }
@@ -226,14 +243,18 @@ function handleShield() {
 }
 
 function handleBomb() {
+    bombActive = true;
+    bombDirection = 1;
+    bombRadius = 0;
+}
+
+function explodeBomb(radius) {
     activeBlocks = activeBlocks.filter((block) => {
         return (
-            block.x < player.x - 200 ||
-            block.x > player.x + 200 ||
-            block.y < player.y - 200 ||
-            block.y > player.y + 200
+            radius < Math.sqrt((block.x - player.x) ** 2 + (block.y - player.y) ** 2)
         );
     });
+    bombActive = false;
 }
 
 let keysPressed = {};

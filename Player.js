@@ -5,6 +5,8 @@ export default class createPlayer {
         this.x = x;
         this.y = y;
         this.colour = "#008000";
+        this.turbofx = new Image();
+        this.turbofx.src = "./images/turbofx.svg";
     }
 
     move(ctx, playerSpeedMultiplier, keysPressed) {
@@ -32,6 +34,10 @@ export default class createPlayer {
         if (currentPowerup === "shield") {
             ctx.fillStyle = "white";
             ctx.fillRect(this.x - 2, this.y - 2, this.width + 4, this.height + 4);
+        }
+
+        if (currentPowerup === "turbo") {
+            ctx.drawImage(this.turbofx, this.x - 20, this.y + this.height * 1/8, this.width* 3/4, this.height * 3/4);
         }
 
         ctx.fillStyle = this.colour;
