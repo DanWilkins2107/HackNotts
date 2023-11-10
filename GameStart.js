@@ -29,26 +29,33 @@ let activeBlocks = [];
 let activePowerupBlocks = [];
 let gameLoop;
 let blockIncreaseSpeed;
-let highScore;
+let highScore = 0;
 let playerSpeedMultiplier;
 let blockSpeedMultiplier;
 let blockSpawnMultiplier;
+let blockCount = 0;
+let powerupCount = 0;
 let gameRun = 0;
 
 function addBlockToArray(assignedGame) {
-    let block = new createBlock(30, 30, canvasWidth, canvasHeight);
-    activeBlocks.push(block);
-    setTimeout(() => {
-        checkBlockToArrayGameEnd(assignedGame);
-    }, 1000 / blockSpawnMultiplier ** 4);
+    if (!activePowerups.some((powerup) => powerup[0] === "slowMo") || blockCount % 2 === 0) {
+        let block = new createBlock(30, 30, canvasWidth, canvasHeight);
+        activeBlocks.push(block);
+        setTimeout(() => {
+            checkBlockToArrayGameEnd(assignedGame);
+        }, 1000 / blockSpawnMultiplier ** 4);
+    }
 }
 
 function addPowerupToArray(assignedGame) {
-    let powerup = new createPowerup(30, 30, canvasWidth, canvasHeight);
-    activePowerupBlocks.push(powerup);
-    setTimeout(() => {
-        checkPowerupToArrayGameEnd(assignedGame);
-    }, 3000 / blockSpawnMultiplier ** 4);
+    if (!activePowerups.some((powerup) => powerup[0] === "slowMo") || powerupCount % 2 === 0) {
+        let powerup = new createPowerup(30, 30, canvasWidth, canvasHeight);
+        activePowerupBlocks.push(powerup);
+
+        setTimeout(() => {
+            checkPowerupToArrayGameEnd(assignedGame);
+        }, 3000 / blockSpawnMultiplier ** 4);
+    }
 }
 
 function checkBlockToArrayGameEnd(assignedGame) {
@@ -88,12 +95,12 @@ function startGameLoop() {
 }
 
 function increaseBlockRates() {
-    if (blockSpawnMultiplier < 2) {
-        blockSpeedMultiplier *= 1.1;
-        blockSpawnMultiplier *= 1.1;
+    if (blockSpawnMultiplier < 1.5) {
+        blockSpeedMultiplier += 0.1;
+        blockSpawnMultiplier += 0.1;
     } else {
-        blockSpeedMultiplier *= 1.05;
-        blockSpawnMultiplier *= 1.05;
+        blockSpeedMultiplier += 0.05;
+        blockSpawnMultiplier += 0.05;
     }
 }
 
@@ -144,11 +151,14 @@ function lowerPowerupCount(ctx, activePowerups) {
 
 function stopGame(ctx) {
     clearInterval(gameLoop);
-    highScore = score.saveScore();
-    gameEndScreen(ctx, highScore);
+    let gameScore = score.saveScore();
+    if (gameScore > highScore) {
+        highScore = gameScore;
+    }
+    gameEndScreen(ctx, gameScore);
 }
 
-function gameEndScreen(ctx, highScore) {
+function gameEndScreen(ctx, gameScore) {
     let gameEnded = true;
     const x = canvasWidth / 2;
     const y = canvasHeight / 2;
@@ -162,10 +172,11 @@ function gameEndScreen(ctx, highScore) {
     ctx.fillStyle = "white";
     ctx.textAlign = "center";
     ctx.fillText(`Game Over!`, x, y - 50);
-    ctx.font = "60px Arial";
-    ctx.fillText(`Score: ${highScore}`, x, y + 10);
     ctx.font = "30px Arial";
-    ctx.fillText(`Press Enter to Play Again`, x, y + 50);
+    ctx.fillText(`Score: ${gameScore}`, x, y + 20);
+    ctx.font = "30px Arial";
+    ctx.fillText(`Highscore: ${highScore}`, x, y + 50);
+    ctx.fillText(`Press Enter to Play Again`, x, y + 120);
 
     document.addEventListener("keydown", (event) => {
         if (event.key === "Enter" && gameEnded === true) {
