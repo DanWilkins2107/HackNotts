@@ -4,6 +4,8 @@ export default class createBlock {
         this.height = height;
         this.x = canvasWidth + 100;
         this.y = Math.floor(Math.random() * canvasHeight - 20) + 10;
+				this.icon = new Image();
+				this.icon.src = `./images/block-icon.svg`;
 				this.freeze = new Image();
 				this.freeze.src = `./images/freeze.svg`;
     }
@@ -23,8 +25,7 @@ export default class createBlock {
     }
 
     draw(ctx, activePowerups) {
-        ctx.fillStyle = "red";
-        ctx.fillRect(this.x, this.y, this.width, this.height);
+				ctx.drawImage(this.icon, this.x, this.y, this.width, this.height);
 				if (activePowerups.some((powerup) => powerup[0] === "slowMo")) {
 					ctx.drawImage(this.freeze, this.x - 4, this.y - 4, 1.27 * this.width, 1.27 * this.height);
 				}

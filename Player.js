@@ -4,7 +4,8 @@ export default class createPlayer {
         this.height = height;
         this.x = x;
         this.y = y;
-        this.colour = "#008000";
+        this.icon = new Image();
+        this.icon.src = "./images/player-icon.svg";
         this.turbofx = new Image();
         this.turbofx.src = "./images/turbofx.svg";
     }
@@ -46,7 +47,7 @@ export default class createPlayer {
         if (activePowerups.some((powerup) => powerup[0] === "turbo")) {
             ctx.drawImage(this.turbofx, this.x - 20, this.y + this.height * 1/8, this.width* 3/4, this.height * 3/4);
         }
-        ctx.fillStyle = this.colour;
-        ctx.fillRect(this.x, this.y, this.width, this.height);
+
+        ctx.drawImage(this.icon, this.x, this.y, this.width, this.height);
     }
 }
